@@ -34,7 +34,7 @@ SOFTWARE.
 
 #include "board.h"
 
-static char code[] = "bad-apple.code";
+static char code[] = "Bad-Apple-IIgs.code";
 
 static FIL file;
 
