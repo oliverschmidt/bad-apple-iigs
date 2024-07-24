@@ -132,7 +132,7 @@ SOFTWARE.
         lda #>$8000
         sta $C03D       ; OSC 1
 
-        ; Set OSC 0/1 wave form to 32kB and to resolution to 0
+        ; Set OSC 0/1 wave form to 32kB and resolution to 0
         lda #$C0        ; Wave
         sta $C03E
         lda #%00111000  ; 32kB, resolution 0
