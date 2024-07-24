@@ -22,8 +22,8 @@ Usage:
 
 Demo:
 
-N/A
+* [Bad Apple!! On The Apple IIgs](https://youtu.be/CnemTrIuyy0)
 
 Building the code generator:
 
-`gcc -O gen-code.c -lpng -lz`
+* `gcc -O gen-code.c -lpng -lz`
