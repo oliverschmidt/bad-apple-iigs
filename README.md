@@ -8,6 +8,7 @@ The single purpose of this firmware is to play the [Bad Apple!!](https://en.wiki
 
 Notes:
 * This is just a silly little project that shows how to have fun with the A2Pico.
+* The A2Pico is used here to provide 80 MB of "streamed memory" to execute.
 * The use of an Apple IIgs stereo audio interface is strongly recommended!
 * The mono speaker/headphone volume adheres to the Control Panel setting at playback start.
 
