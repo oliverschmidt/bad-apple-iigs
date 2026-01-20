@@ -22,9 +22,9 @@ FetchContent_MakeAvailable(FatFs_SPI)
 
 set_source_files_properties(incbin.S OBJECT_DEPENDS firmware.rom)
 add_custom_command(
-        COMMAND cl65 ${CMAKE_CURRENT_SOURCE_DIR}/firmware.S
-                  -o ${CMAKE_CURRENT_BINARY_DIR}/firmware.rom
-                  -C apple2-asm.cfg
+        COMMAND cl65 -t apple2 -C apple2-asm.cfg
+                        ${CMAKE_CURRENT_SOURCE_DIR}/firmware.S
+                     -o ${CMAKE_CURRENT_BINARY_DIR}/firmware.rom                    
         MAIN_DEPENDENCY firmware.S
         OUTPUT firmware.rom
         VERBATIM
