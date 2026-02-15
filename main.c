@@ -43,9 +43,7 @@ static FIL file;
 void start(void) {
     printf("Start\n");
 
-#ifdef PICO_DEFAULT_LED_PIN
     gpio_put(PICO_DEFAULT_LED_PIN, true);
-#endif
 
     f_close(&file);
 
@@ -60,9 +58,7 @@ void start(void) {
         printf("f_read(%s) error: %s (%d)\n", code, FRESULT_str(fr), fr);
     }
 
-#ifdef PICO_DEFAULT_LED_PIN
     gpio_put(PICO_DEFAULT_LED_PIN, false);
-#endif
 }
 
 void main(void) {
@@ -71,10 +67,8 @@ void main(void) {
 
     set_sys_clock_khz(200000, false);
 
-#ifdef PICO_DEFAULT_LED_PIN
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-#endif 
 
     stdio_init_all();
     printf("Bad Apple !!\n");
@@ -100,9 +94,7 @@ void main(void) {
         }
         uint32_t next = multicore_fifo_pop_blocking();
 
-#ifdef PICO_DEFAULT_LED_PIN
         gpio_put(PICO_DEFAULT_LED_PIN, true);
-#endif
 
         UINT br;
         FRESULT fr = f_read(&file, bank[next], sizeof(bank[0]), &br);
@@ -110,8 +102,6 @@ void main(void) {
             printf("f_read(%s) error: %s (%d)\n", code, FRESULT_str(fr), fr);
         }
 
-#ifdef PICO_DEFAULT_LED_PIN
         gpio_put(PICO_DEFAULT_LED_PIN, false);
-#endif
     }
 }

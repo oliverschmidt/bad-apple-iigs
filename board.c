@@ -49,25 +49,25 @@ static void __time_critical_func(handle_reset)(bool asserted) {
 
 void __time_critical_func(board)(void) {
 
-    a2pico_init(pio0);
+    a2pico_init();
 
     a2pico_resethandler(&handle_reset);
 
     while (true) {
-        uint32_t pico = a2pico_getaddr(pio0);
+        uint32_t pico = a2pico_getaddr();
         uint32_t addr = pico & 0x0FFF;
         uint32_t io   = pico & 0x0F00;      // IOSTRB or IOSEL
         uint32_t strb = pico & 0x0800;      // IOSTRB
-        uint32_t read = pico & 0x1000;      // R/W
+        uint32_t read = pico & RW_BIT;      // R/W
 
         if (read) {
             if (strb) {  // IOSTRB
                 if (active) {
-                    a2pico_putdata(pio0, bank[curr][addr & 0x7FF]);
+                    a2pico_putdata(bank[curr][addr & 0x7FF]);
                 }
             }
             else if (io) {  // IOSEL
-                a2pico_putdata(pio0, firmware[addr & 0x0FF]);
+                a2pico_putdata(firmware[addr & 0x0FF]);
             }
         }
 
