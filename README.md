@@ -13,8 +13,8 @@ Notes:
 * The mono speaker/headphone volume adheres to the Control Panel setting at playback start.
 
 Usage:
-* Flash [Bad-Apple-IIgs.uf2](https://github.com/oliverschmidt/bad-apple-iigs/releases/latest/download/Bad-Apple-IIgs.uf2) to the A2Pico.
-* Copy [Bad-Apple-IIgs.code](https://github.com/oliverschmidt/bad-apple-iigs/releases/latest/download/Bad-Apple-IIgs.code) to the root directory of an SD card.
+* Flash the [.uf2 file](https://github.com/oliverschmidt/bad-apple-iigs/releases/latest/) to the A2Pico.
+* Copy the [.code file](https://github.com/oliverschmidt/bad-apple-iigs/releases/latest/) to the root directory of an SD card.
 * Insert the SD card into the A2Pico.
 * Insert the A2Pico into an Apple IIgs.
 * Get to the BASIC prompt.
