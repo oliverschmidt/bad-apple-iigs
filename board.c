@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <hardware/sync.h>
+
 #include <a2pico.h>
 
 #include "board.h"
