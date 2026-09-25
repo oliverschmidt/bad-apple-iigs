@@ -30,9 +30,9 @@ SOFTWARE.
 #include <hardware/clocks.h>
 #include <hardware/structs/busctrl.h>
 
-#include <rtc.h>
-#include <f_util.h>
+#include <a2pico.h>
 #include <hw_config.h>
+#include <f_util.h>
 
 #include "board.h"
 
@@ -43,7 +43,9 @@ static FIL file;
 void start(void) {
     printf("Start\n");
 
-    gpio_put(PICO_DEFAULT_LED_PIN, true);
+    if (a2pico_led() >= 0) {
+        gpio_put(a2pico_led(), true);
+    }
 
     f_close(&file);
 
@@ -58,7 +60,9 @@ void start(void) {
         printf("f_read(%s) error: %s (%d)\n", code, FRESULT_str(fr), fr);
     }
 
-    gpio_put(PICO_DEFAULT_LED_PIN, false);
+    if (a2pico_led() >= 0) {
+        gpio_put(a2pico_led(), false);
+    }
 }
 
 void main(void) {
@@ -67,18 +71,23 @@ void main(void) {
 
     set_sys_clock_khz(200000, false);
 
-    gpio_init(PICO_DEFAULT_LED_PIN);
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+    if (a2pico_led() >= 0) {
+        gpio_init(a2pico_led());
+        gpio_set_dir(a2pico_led(), GPIO_OUT);
+    }
 
-    stdio_init_all();
+    stdio_uart_init_full(uart0, PICO_DEFAULT_UART_BAUD_RATE, a2pico_tx(), a2pico_rx());
     printf("Bad Apple !!\n");
 
-    time_init();
+    if (!a2pico_sd()) {
+        printf("No SD Card slot :-(\n");
+        return;
+    }
 
     sd_card_t *sd_card = sd_get_by_num(0);
-    FRESULT fr = f_mount(&sd_card->fatfs, sd_card->pcName, 1);
+    FRESULT fr = f_mount(&sd_card->state.fatfs, "", 1);
     if (fr != FR_OK) {
-        printf("f_mount(%s) error: %s (%d)\n", sd_card->pcName, FRESULT_str(fr), fr);
+        printf("f_mount() error: %s (%d)\n", FRESULT_str(fr), fr);
     }
 
     while (true) {
@@ -94,7 +103,9 @@ void main(void) {
         }
         uint32_t next = multicore_fifo_pop_blocking();
 
-        gpio_put(PICO_DEFAULT_LED_PIN, true);
+        if (a2pico_led() >= 0) {
+            gpio_put(a2pico_led(), true);
+        }
 
         UINT br;
         FRESULT fr = f_read(&file, bank[next], sizeof(bank[0]), &br);
@@ -102,6 +113,8 @@ void main(void) {
             printf("f_read(%s) error: %s (%d)\n", code, FRESULT_str(fr), fr);
         }
 
-        gpio_put(PICO_DEFAULT_LED_PIN, false);
+        if (a2pico_led() >= 0) {
+            gpio_put(a2pico_led(), false);
+        }
     }
 }

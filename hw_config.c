@@ -15,65 +15,88 @@ specific language governing permissions and limitations under the License.
 
 This file should be tailored to match the hardware design.
 
-There should be one element of the spi[] array for each hardware SPI used.
-
-There should be one element of the sd_cards[] array for each SD card slot.
-The name is should correspond to the FatFs "logical drive" identifier.
-(See http://elm-chan.org/fsw/ff/doc/filename.html#vol)
-The rest of the constants will depend on the type of
-socket, which SPI it is driven by, and how it is wired.
+See
+https://github.com/carlk3/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/tree/main#customizing-for-the-hardware-configuration
 
 */
 
 #include <a2pico.h>
 #include <hw_config.h>
 
-// Hardware Configuration of SPI "objects"
-// Note: multiple SD cards can be driven by one SPI if they use different slave
-// selects.
-static spi_t spis[] = {  // One for each SPI.
-    {
-        .hw_inst   = spi0,
-        .miso_gpio = GPIO_SPI0_RX,
-        .mosi_gpio = GPIO_SPI0_TX,
-        .sck_gpio  = GPIO_SPI0_SCK,
-        .baud_rate = 12500 * 1000
-        // .baud_rate = 25 * 1000 * 1000 // Actual frequency: 20833333.
-    }
+#if PICO_RP2350
+
+/* SDIO Interface */
+static sd_sdio_if_t sdio_if = {
+    /*
+    Pins CLK_gpio, D1_gpio, D2_gpio, and D3_gpio are at offsets from pin D0_gpio.
+    The offsets are determined by sd_driver\SDIO\rp2040_sdio.pio.
+        CLK_gpio = (D0_gpio + SDIO_CLK_PIN_D0_OFFSET) % 32;
+        As of this writing, SDIO_CLK_PIN_D0_OFFSET is 30,
+            which is -2 in mod32 arithmetic, so:
+        CLK_gpio = D0_gpio -2.
+        D1_gpio = D0_gpio + 1;
+        D2_gpio = D0_gpio + 2;
+        D3_gpio = D0_gpio + 3;
+    */
+    .CMD_gpio  = GPIO_SDIO_CMD,
+    .D0_gpio   = GPIO_SDIO_DAT0,
+    .SDIO_PIO  = pio2,
+    .baud_rate = 200 * 1000 * 1000 / 4  // 50 MHz
 };
 
-// Hardware Configuration of the SD Card "objects"
-static sd_card_t sd_cards[] = {  // One for each SD card
-    {
-        .pcName          = "0:",           // Name used to mount device
-        .spi             = &spis[0],       // Pointer to the SPI driving this card
-        .ss_gpio         = GPIO_SPI0_CSN,  // The SPI slave select for this SD card
-        .use_card_detect = false,
-    }
+/* Configuration of the SD Card socket object */
+static sd_card_t sd_card = {
+    .type            = SD_IF_SDIO,
+    .sdio_if_p       = &sdio_if,  // Pointer to the SDIO interface driving this card
+    .use_card_detect = false
 };
+
+#else
+
+/* Configuration of hardware SPI object */
+static spi_t spi = {
+    .hw_inst   = spi0,                  // SPI component
+    .sck_gpio  = GPIO_SPI0_SCK,         // GPIO number (not Pico pin number)
+    .mosi_gpio = GPIO_SPI0_TX,
+    .miso_gpio = GPIO_SPI0_RX,
+    .baud_rate = 200 * 1000 * 1000 / 8  // 25 MHz
+};
+
+/* SPI Interface */
+static sd_spi_if_t spi_if = {
+    .spi     = &spi,          // Pointer to the SPI driving this card
+    .ss_gpio = GPIO_SPI0_CSN  // The SPI slave select GPIO for this SD card
+};
+
+/* Configuration of the SD Card socket object */
+static sd_card_t sd_card = {
+    .type            = SD_IF_SPI,
+    .spi_if_p        = &spi_if,  // Pointer to the SPI interface driving this card
+    .use_card_detect = false
+};
+
+#endif
 
 /* ********************************************************************** */
 
-size_t sd_get_num() {
-    return count_of(sd_cards);
-}
+size_t sd_get_num() { return 1; }
 
+/**
+ * @brief Get a pointer to an SD card object by its number.
+ *
+ * @param[in] num The number of the SD card to get.
+ *
+ * @return A pointer to the SD card object, or @c NULL if the number is invalid.
+ */
 sd_card_t *sd_get_by_num(size_t num) {
-    if (num <= sd_get_num()) {
-        return &sd_cards[num];
+    if (0 == num) {
+        // The number 0 is a valid SD card number.
+        // Return a pointer to the sd_card object.
+        return &sd_card;
     } else {
+        // The number is invalid. Return @c NULL.
         return NULL;
     }
 }
 
-size_t spi_get_num() {
-    return count_of(spis);
-}
-
-spi_t *spi_get_by_num(size_t num) {
-    if (num <= spi_get_num()) {
-        return &spis[num];
-    } else {
-        return NULL;
-    }
-}
+/* [] END OF FILE */

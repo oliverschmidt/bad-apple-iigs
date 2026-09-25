@@ -9,16 +9,19 @@ add_executable(${PROJECT_NAME})
 pico_add_extra_outputs(${PROJECT_NAME})
 
 include(FetchContent)
+
 FetchContent_Declare(a2pico
         GIT_REPOSITORY https://github.com/oliverschmidt/a2pico.git
         GIT_TAG main
         )
 FetchContent_MakeAvailable(a2pico)
-FetchContent_Declare(FatFs_SPI
-        GIT_REPOSITORY https://github.com/carlk3/no-OS-FatFS-SD-SPI-RPi-Pico.git
-        SOURCE_SUBDIR FatFs_SPI
+
+FetchContent_Declare(fatfs
+        GIT_REPOSITORY https://github.com/FarLeftLane/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico.git
+        GIT_TAG main
+        SOURCE_SUBDIR src
         )
-FetchContent_MakeAvailable(FatFs_SPI)
+FetchContent_MakeAvailable(fatfs)
 
 set_source_files_properties(incbin.S OBJECT_DEPENDS firmware.rom)
 add_custom_command(
@@ -31,15 +34,15 @@ add_custom_command(
         )
 
 target_sources(${PROJECT_NAME} PRIVATE
-        main.c
         board.c
         hw_config.c
         incbin.S
+        main.c
         )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        pico_stdlib
-        pico_multicore
         a2pico
-        FatFs_SPI
+        no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+        pico_multicore
+        pico_stdlib
         )
