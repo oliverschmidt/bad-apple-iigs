@@ -1,20 +1,19 @@
 set(PROJECT_NAME Bad-Apple-IIgs)
-
 cmake_minimum_required(VERSION 3.13...3.27)
+
+include(FetchContent)
+FetchContent_Declare(a2pico
+        GIT_REPOSITORY https://github.com/oliverschmidt/a2pico.git
+        GIT_TAG main
+        )
+FetchContent_MakeAvailable(a2pico)
+
 include(pico_sdk_import.cmake)
 project(${PROJECT_NAME} C CXX ASM)
 pico_sdk_init()
 
 add_executable(${PROJECT_NAME})
 pico_add_extra_outputs(${PROJECT_NAME})
-
-include(FetchContent)
-
-FetchContent_Declare(a2pico
-        GIT_REPOSITORY https://github.com/oliverschmidt/a2pico.git
-        GIT_TAG main
-        )
-FetchContent_MakeAvailable(a2pico)
 
 FetchContent_Declare(fatfs
         GIT_REPOSITORY https://github.com/FarLeftLane/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico.git
