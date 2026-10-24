@@ -24,8 +24,6 @@ SOFTWARE.
 
 */
 
-#include <hardware/sync.h>
-
 #include <a2pico.h>
 
 #include "board.h"
@@ -49,9 +47,6 @@ static void __time_critical_func(handle_reset)(bool asserted) {
 }
 
 void __time_critical_func(board)(void) {
-
-    a2pico_init();
-
     a2pico_resethandler(&handle_reset);
 
     while (true) {
